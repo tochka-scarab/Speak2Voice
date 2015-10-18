@@ -8,18 +8,20 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
 {
 
+    private static final int VOICE_RECOGNITION_REQUEST_CODE = 1234;
     private ImageButton btnSpeak;
     private TextView txtText;
 
@@ -49,16 +51,16 @@ public class MainActivity extends AppCompatActivity
         List activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         if (activities.size() != 0)
         {
-            btnSpeak.setOnClickListener(new OnClickListener() {
+            btnSpeak.setOnClickListener(new OnClickListener()
+            {
                 @Override
-                public void onClick(View v) {
+                public void onClick(View v)
+                {
                     if (v.getId() == R.id.btnSpeak)
                     {
                         startVoiceRecognitionActivity();
                     }
-                }
-
-                ;
+                };
             });
         }
         else
@@ -70,7 +72,30 @@ public class MainActivity extends AppCompatActivity
 
     private void startVoiceRecognitionActivity()
     {
-        ;
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speech recognition demo");
+        startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == VOICE_RECOGNITION_REQUEST_CODE && resultCode == RESULT_OK)
+        {
+            // Fill the list view with the strings the recognizer thought it could have heard
+            ArrayList matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            String resString = "";
+            for (Object s : matches)
+            {
+                resString += s + "	";
+            }
+
+            txtText.setText(resString);
+
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
