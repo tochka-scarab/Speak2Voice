@@ -1,6 +1,9 @@
 package su.bear.speak2voice;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -8,8 +11,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -26,7 +32,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
+        fab.setOnClickListener(new OnClickListener()
         {
             @Override
             public void onClick(View view)
@@ -39,7 +45,32 @@ public class MainActivity extends AppCompatActivity
         txtText = (TextView) findViewById(R.id.txtText);
         btnSpeak = (ImageButton) findViewById(R.id.btnSpeak);
 
+        PackageManager pm = getPackageManager();
+        List activities = pm.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
+        if (activities.size() != 0)
+        {
+            btnSpeak.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (v.getId() == R.id.btnSpeak)
+                    {
+                        startVoiceRecognitionActivity();
+                    }
+                }
 
+                ;
+            });
+        }
+        else
+        {
+            btnSpeak.setEnabled(false);
+            txtText.setText("Recognizer not present!");
+        }
+    }
+
+    private void startVoiceRecognitionActivity()
+    {
+        ;
     }
 
     @Override
